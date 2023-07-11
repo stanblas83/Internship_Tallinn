@@ -1,20 +1,20 @@
-# EcoLight+: A DDDQN Approach for Intelligent Traffic Signal Control driven by A Data Fusion Urban Noise Prediction Technique
-
+# Emulation of EcoLight+ on a Jetson Nano Developer Kit from a Simulation of Ecolight+ on Sumo
 
 **Authors**
 
-- Chahinez Ounoughi, Department of Software Science, Tallinn University of Technology.
+- Blasco Stanislas, Engineering School, ENSEA Cergy (France).
 
-- Doua Ounoughi, Faculty of Engineering, Çanakkale Onsekiz Mart University.
+- Uljana Reinsalu.
 
 - Sadok Ben Yahia, Department of Software Science, Tallinn University of Technology.
 
 
 **Introduction**
 
-
+This projetct proposes a emulation of a DDDQN reinforcement learning based intelligent traffic light control system : Ecolight+. This emulation is based on a jetson nano developer kit
 This project proposes a DDDQN reinforcement learning based intelligent traffic light control system. Simply run the runexp.py to run the experiment. Please change the parameters in conf/ folder and runexp.py correspondingly if needed. Also, please specify the location of TraCI module in map_computor.py if necessary.
 
+Before implementing on jetson nano you need to run it on your computer. Please follow the instruction from : https://github.com/doua-ounoughi/EcoLightPlus
 
 Before running above codes, you may need to install following packages or environments:
 
