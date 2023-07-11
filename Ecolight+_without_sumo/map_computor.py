@@ -521,6 +521,7 @@ ind_laneNoisePredictTracker = 0
 ind_laneSpeedTracker = 0
 ind_laneTravelTimeTracker = 0
 ind_len_listLanes =0
+
 def status_calculator_noise(noisemodel):
     global ind_mapsOfCars
     df = pd.read_csv('Sumo_record_data/records_sumo/one_run/m/getMapOfVehicles'+str(ind_mapsOfCars)+'.csv')
