@@ -122,43 +122,11 @@ class TrafficLightDQN:
 
         return phase_traffic_ratios
 
-    @staticmethod
-    def _set_traffic_file(sumo_config_file_tmp_name, sumo_config_file_output_name, list_traffic_file_name):
-
-        # update sumocfg
-        sumo_cfg = ET.parse(sumo_config_file_tmp_name)
-        config_node = sumo_cfg.getroot()
-        input_node = config_node.find("input")
-        for route_files in input_node.findall("route-files"):
-            input_node.remove(route_files)
-        input_node.append(
-            ET.Element("route-files", attrib={"value": ",".join(list_traffic_file_name)}))
-        sumo_cfg.write(sumo_config_file_output_name)
-
-    def set_traffic_file(self):
-
-        #self._set_traffic_file(
-         #   os.path.join(self.path_set.PATH_TO_DATA, "cross_pretrain.sumocfg"),
-          #  os.path.join(self.path_set.PATH_TO_DATA, "cross_pretrain.sumocfg"),
-           # self.para_set.TRAFFIC_FILE_PRETRAIN)
-        self._set_traffic_file(
-            os.path.join(self.path_set.PATH_TO_DATA, "osm.sumocfg"),
-            os.path.join(self.path_set.PATH_TO_DATA, "osm.sumocfg"),
-            self.para_set.TRAFFIC_FILE)
-       # for file_name in self.path_set.TRAFFIC_FILE_PRETRAIN:
-        #    shutil.copy(
-         #           os.path.join(self.path_set.PATH_TO_DATA, file_name),
-          #          os.path.join(self.path_set.PATH_TO_OUTPUT, file_name))
-        for file_name in self.path_set.TRAFFIC_FILE:
-            shutil.copy(
-                os.path.join(self.path_set.PATH_TO_DATA, file_name),
-                os.path.join(self.path_set.PATH_TO_OUTPUT, file_name))
-
     def show_RAM_usage(self):
         py = psutil.Process(os.getpid())
         print('RAM usage: {} GB'.format(py.memory_info()[0]/2. ** 30))
     
-    def train(self, sumo_cmd_str, if_pretrain, use_average, noise_model):
+    def train(self, if_pretrain, use_average, noise_model):
 
         if if_pretrain:
             total_run_cnt = self.para_set.RUN_COUNTS_PRETRAIN
@@ -172,8 +140,7 @@ class TrafficLightDQN:
         file_name_memory = os.path.join(self.path_set.PATH_TO_OUTPUT, "memories.csv")
 
         # start sumo
-        s_agent = SumoAgent(sumo_cmd_str,
-                            self.path_set, noise_model)
+        s_agent = SumoAgent(self.path_set, noise_model)
         current_time = s_agent.get_current_time()  # in seconds
 
         f_memory = open(file_name_memory, "a")
@@ -191,8 +158,7 @@ class TrafficLightDQN:
                     if ind_phase_time >= len(phase_traffic_ratios):
                         break
 
-                    s_agent = SumoAgent(sumo_cmd_str,
-                            self.path_set,noise_model)
+                    s_agent = SumoAgent(self.path_set,noise_model)
                     current_time = s_agent.get_current_time()  # in seconds
 
                 phase_time_now = phase_traffic_ratios[ind_phase_time]
@@ -247,21 +213,29 @@ class TrafficLightDQN:
 
             if not if_pretrain:
                 # update network
+                print("updating")
+                t = time.time()
                 self.agent.update_network(if_pretrain, use_average, current_time)
                 self.agent.update_network_bar()
+                print("updated")
+                time_passed = time.time() - t 
+                print(time_passed)
 
         if if_pretrain:
+            print("updating")
+            t = time.time()
             self.agent.set_update_outdated()
             self.agent.update_network(if_pretrain, use_average, current_time)
             self.agent.update_network_bar()
+            print("updated")
+            time_passed = time.time() - t 
+            print(time_passed)
         self.agent.reset_update_count()
         print("END")
 
 
-def main(memo, f_prefix, sumo_cmd_str, noise_model):
-
+def main(memo, f_prefix, noise_model):
     player = TrafficLightDQN(memo, f_prefix)
-    player.set_traffic_file()
     #player.train(sumo_cmd_pretrain_str, if_pretrain=True, use_average=True)
-    player.train(sumo_cmd_str, if_pretrain=False, use_average=True, noise_model=noise_model)
+    player.train( if_pretrain=False, use_average=True, noise_model=noise_model)
 

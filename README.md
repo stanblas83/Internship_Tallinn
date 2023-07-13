@@ -1,4 +1,4 @@
-# EcoLight+: A DDDQN Approach for Intelligent Traffic Signal Control driven by A Data Fusion Urban Noise Prediction Technique
+# Emulation of EcoLight+ on a Jetson Nano Developer Kit from a Simulation of Ecolight+ on Sumo
 
 
 **Authors**

@@ -32,122 +32,12 @@ constantC = 40.0
 grid_width = 4
 area_length = 600
 
-import os
-from simplified_scrapy import SimplifiedDoc, utils
 
-path = 'data/one_run/m'
-#read the whole text from 
-myList = []
-for root, dirs, files in os.walk(path):
-    
-    for file in files:
-        if file.endswith('osm.net.xml'):
-            myList.append(os.path.join(root, file))
-
-for file in myList:
-    xml = utils.getFileContent(file)
-    doc = SimplifiedDoc(xml)
-    arg = [ (e['tl'], e['linkIndex'],e['dir'],e['via']) for e in doc.selects('connection')]
-
-    
-arg = list(dict.fromkeys(arg))
-
-for file in myList:
-    xml = utils.getFileContent(file)
-    doc = SimplifiedDoc(xml)
-    tl = [ e['id'] for e in doc.selects('tlLogic')]
-
-    
-
-
-import pandas as pd
-data = pd.DataFrame(columns= ["tl","index","dir","via"], index=range(len(arg)))
-l = []
-for i in range(len(arg)):
-    l.append(arg[i][0] )
-    if arg[i][0] == tl[0]:
-        data.iloc[i,0] = arg[i][0]
-        data.iloc[i,3] = arg[i][3]
-        data.iloc[i,1] = arg[i][1]
-        data.iloc[i,2] = arg[i][2]
-        
-data.dropna(inplace=True)
-data.iloc[:,3] = data.iloc[:,3].str.replace(tl[0],'')
-data = data.sort_values(by='index')
-data.reset_index(inplace=True,drop=True)
-data = data.drop(columns=['tl'])
-direction_lane_dict = {}
-for i in data.groupby('dir'):
-    d = i[0].upper()+'G'
-    direction_lane_dict[d] = [int(x) for x in i[1]['index']]
-    
-for file in myList:
-    xml = utils.getFileContent(file)
-    doc = SimplifiedDoc(xml)
-    arg = [ (e['tl'],e['from'], e['to'],e['fromLane'],e['toLane']) for e in doc.selects('connection')]
-            
-arg = list(dict.fromkeys(arg))
-
-import pandas as pd
-data = pd.DataFrame(columns= ["from","to","froml","tol"], index=range(len(arg)))
-for i in range(len(arg)):
-    if arg[i][0] == tl[0]:
-        data.iloc[i,0] = arg[i][1]
-        data.iloc[i,1] = arg[i][2]
-        data.iloc[i,2] = arg[i][3]
-        data.iloc[i,3] = arg[i][4]
-        
-data.dropna(inplace=True)
-data['from'] = data['from']+'_'+data['froml']
-data['to'] = data['to']+'_'+data['tol'] 
-l = list(data['from'].unique())
-for i in data['to'].unique():
-    l.append(i)
-
-node_light_7 = tl[0]
-listLanes = set(l)
-
-
-direction_list = [k for k in direction_lane_dict]
-
-for file in myList:
-    xml = utils.getFileContent(file)
-    doc = SimplifiedDoc(xml)
-    arg = [ e['state'] for e in doc.selects('phase')]
-         
-arg = list(dict.fromkeys(arg))
-green = []
-lenpahse = len(arg[0])
-for i in arg: 
-    if 'g' in i or 'G' in i:
-        green.append(i)
-        
-phases_names =[]
-phases = {}
-controlSignal = []
-
-
-
-for i in green:
-    p = ''
-    for j in range(len(i)):
-        if i[j]=='G' or i[j]=='g':
-            for key in direction_lane_dict:
-                if j+1 in direction_lane_dict[key]:
-                    if p == '':
-                        p = p + key
-                    else:
-                        p = p + '_' +key
-
-    if p not in phases_names:
-        phases[p] = i
-        controlSignal.append(i)
-        phases_names.append(p)
-    
-phases_light_7 = [p for p in phases]
-
+lenpahse = 172
+phases_light_7 = ['RG_SG_SG_SG_LG_SG_LG_RG_LG_TG_RG_SG_RG_SG_SG_LG_SG_LG_RG_LG_TG_RG', 'SG_SG_LG_SG_LG_RG_LG_TG_RG_SG_SG_SG_SG_LG_RG_LG_TG_RG', 'SG_SG_LG_SG_LG_RG_LG_RG_TG_RG_SG_LG_SG_LG_LG_RG_TG', 'RG_RG_RG_SG_LG_SG_LG_TG_RG_LG_RG_LG_RG_RG_SG_SG_SG_TG_SG', 'LG_RG_LG_RG_SG_RG_SG_SG_LG_SG_LG_TG_RG_RG_LG_SG_RG_SG_RG_SG_SG_LG_TG', 'SG_RG_SG_SG_LG_SG_LG_RG_LG_RG_TG_LG_SG_RG_SG_SG_LG_LG_LG_SG_TG_SG', 'LG_RG_RG_RG_SG_SG_SG_LG_LG_TG_RG_LG_RG_SG_RG_SG_SG_SG_RG_LG_TG_RG', 'RG_RG_RG_SG_SG_LG_LG_TG_RG_RG_SG_SG_SG_RG_LG_TG_RG', 'RG_SG_SG_LG_SG_LG_RG_LG_RG_TG_RG_SG']
 numphases = len(phases_light_7)
-
+node_light_7 = 'cluster_11791147_1259892844_1259892853_1259892859_2032404487_2535135910_27789090_320247058_7123869611_7123869612_81289422_81290972_996182408'
+listLanes = {'177513122#0_1', '177513122#0_2', '317245904#0_2', '762416404#1_0', '-806118899#2_0', '110282956#2_0', '-806118902#2_0', '317209212#0_3', '-1052446122_0', '806118898#2_0', '-806118899#0_0', '127375467#1_2', '317245904#0_3', '619973576#1_4', '317209212#0_0', '246476583#0_0', '127375467#1_0', '127375383#1_0', '806118903_0', '317209212#0_2', '619973576#1_1', '127375467#1_1', '317209212#0_1', '246476583#1_0', '893990362#1_0', '893990362#1_1', '-246476583#0_0', '177513122#0_0', '806118899#2_0', '-806118898#0_0', '127375383#1_1', '894002830#1_1', '619973576#1_2', '619973576#1_0', '-246476583#1_0', '894002830#1_0', '255736353_0', '806118902#2_0', '-1052446121_0', '317245904#0_1', '619973576#1_3', '317245904#0_0', '-806118902#0_0'}
 
 '''
 input: phase "NSG_SNG" , four lane number, in the key of W,E,S,N
@@ -159,7 +49,7 @@ output:
 current_time = 0 
 def get_current_time():
     global current_time 
-    print (current_time)
+    #print (current_time)
     df = pd.read_csv('Sumo_record_data/records_sumo/one_run/m/get_current_time.csv')
     time = df.iloc[current_time,0]  
     current_time += 1
@@ -298,22 +188,6 @@ def changeTrafficLight_7(current_phase=0):  # [WNG_ESG_WSG_ENG_NWG_SEG]
 
 
 
-def get_phase_vector(current_phase=0):
-    phase = phases_light_7[current_phase].split("_")
-    phase_vector = [0] * len(direction_list)
-    for direction in phase:
-        phase_vector[direction_list.index(direction)] = 1
-    return np.array(phase_vector)
-
-
-def getMapOfCertainTrafficLight(curtent_phase=0, tl_node_id=node_light_7, area_length=600):
-    current_phases_light_7 = [phases_light_7[curtent_phase]]
-    parameterArray = phases_affected_lane_postions(phases=current_phases_light_7)
-    length_num_grids = int(area_length / grid_width)
-    resultTrained = np.zeros((length_num_grids, length_num_grids))
-    for affected_road in parameterArray:
-        resultTrained[affected_road[0]:affected_road[1], affected_road[2]:affected_road[3]] = 127
-    return resultTrained
 
 
 
@@ -481,34 +355,6 @@ def update_vehicles_state(dic_vehicles):
     
     return dic_vehicles
 
-def status_calculator():
-    laneQueueTracker=[]
-    laneNumVehiclesTracker=[]
-    laneWaitingTracker=[]
-    #================= COUNT HALTED VEHICLES (I.E. QUEUE SIZE) (12 elements)
-    for lane in listLanes:
-        laneQueueTracker.append(traci.lane.getLastStepHaltingNumber(lane))
-
-    # ================ count vehicles in lane
-    for lane in listLanes:
-        laneNumVehiclesTracker.append(traci.lane.getLastStepVehicleNumber(lane))
-
-    # ================ cum waiting time in minutes
-    for lane in listLanes:
-        laneWaitingTracker.append(traci.lane.getWaitingTime(str(lane)) / 60)
-
-    # ================ get position matrix of vehicles on lanes
-    mapOfCars = getMapOfVehicles(area_length=area_length)
-
-    if not os.path.exists("Sumo_record_data/records_sumo/one_run/m/status_calculator.csv"):
-        df = pd.DataFrame(columns = ['laneQueueTracker', 'laneNumVehiclesTracker', 'laneWaitingTracker', 'mapOfCars'])
-        df.to_csv("Sumo_record_data/records_sumo/one_run/m/status_calculator.csv",index=False)
-    data = pd.read_csv("Sumo_record_data/records_sumo/one_run/m/status_calculator.csv")
-    data2 = pd.DataFrame([laneQueueTracker, laneNumVehiclesTracker, laneWaitingTracker, mapOfCars],columns = ['laneQueueTracker', 'laneNumVehiclesTracker', 'laneWaitingTracker', 'mapOfCars'])
-    data3 = pd.concat([data,data2], ignore_index =  True)
-    data3.to_csv("Sumo_record_data/records_sumo/one_run/m/status_calculator.csv",index=False)
-
-    return [laneQueueTracker, laneNumVehiclesTracker, laneWaitingTracker, mapOfCars]
 
 ind_laneQueueTracker = 0
 ind_laneNumVehiclesTracker=0
@@ -649,7 +495,7 @@ def set_yellow(dic_vehicles,rewards_info_dict,f_log_rewards,rewards_detail_dict_
 def set_all_red(dic_vehicles,rewards_info_dict,f_log_rewards,rewards_detail_dict_list,node_id=node_light_7):
     Red = ''
     for i in range(lenpahse):
-        Red = Yellow+"r"
+        Red = Red+"r"
     for i in range(3):
         global current_time 
         df = pd.read_csv('Sumo_record_data/records_sumo/one_run/m/get_current_time.csv')
