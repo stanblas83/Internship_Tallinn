@@ -38,7 +38,37 @@ The files are functioning like this:
 
 - `Emulated_on_jetson`
 
-  Run the algorithm on your jetson nano 
+  Simulate the reinforcement learning agent. This file simulates the timeline, get current state from sumo_agent, get current state from sumo_agent and call the agent to make decision.
+
+- `sumo_agent.py`
+
+  Interact with map_computor to get state, reward from the map_computor, and convey action to map_computor.
+
+- `map_computor.py`
+
+  Read data from SUMO and operate SUMO.
+
+- `agent.py`
+
+  Abstract class of agent.
+
+- `network_agent.py`
+
+  Abstract class of neural network based agent.
+
+- `dueling_agent.py`
+
+  Class of our method.
+
+- `conf/`
+
+  Configuration files.
+
+- `data/`
+
+  Traffic flow files. The intersection is connected with four road segments of 300-meters long.
+
+- `OHANA.py`
 
 
 
